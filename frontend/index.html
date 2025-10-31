@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Johan'S Hub - Premium Men's T-Shirts</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+              inter: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              'brand-dark': '#1a202c',
+              'brand-accent': '#c59d5f',
+              'brand-accent-dark': '#b08d55',
+              'brand-bg': '#f7f7f7',
+              'brand-card': '#ffffff',
+            },
+          },
+        },
+      }
+    </script>
+    
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.546.0",
+        "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.24"
+      }
+    }
+    </script>
+
+    </head>
+  <body class="bg-brand-bg text-brand-dark font-sans">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
