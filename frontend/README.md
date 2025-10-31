@@ -1,6 +1,6 @@
-# Johan's Hub E-Commerce
+# MERN E-Commerce Platform
 
-A full-stack MERN (MongoDB, Express, React, Node.js) e-commerce platform built for selling T-shirts. This project features a complete user-facing storefront, a dynamic cart, and a full-featured admin panel for managing products and orders.
+A full-stack MERN e-commerce platform built for a T-shirt business. It features a dynamic React frontend, product filtering, and a complete admin panel with full CRUD operations for products and orders, including manual Bkash/Nagad payment verification.
 
 ---
 
@@ -82,7 +82,7 @@ Follow these steps to set up the project locally.
     ```bash
     npm run data:import
     ```
-
+    *(Default Admin: `admin@gmail.com` / Password: `admin123`)*
 
 ### 2. Frontend Setup
 
