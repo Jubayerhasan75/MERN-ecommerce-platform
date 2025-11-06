@@ -1,170 +1,198 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { CartItem, Product, UserInfo, AppContextType } from '../types';
+import { AppContextType, CartItem, Product, UserInfo } from '../types';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
-// Action types define what operations we can perform
-type Action =
-  | { type: 'CART_ADD_ITEM'; payload: CartItem }
-  | { type: 'CART_REMOVE_ITEM'; payload: { productId: string; size: string; color: string } }
-  | { type: 'CART_UPDATE_QUANTITY'; payload: { productId: string; size: string; color: string; quantity: number } }
-  | { type: 'CART_CLEAR' }
-  | { type: 'FAVORITES_ADD_ITEM'; payload: Product }
-  | { type: 'FAVORITES_REMOVE_ITEM'; payload: string }
-  | { type: 'USER_LOGIN'; payload: UserInfo }
-  | { type: 'USER_LOGOUT' };
+const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// This is the shape of our global state
-interface AppState {
+type State = {
   cart: CartItem[];
   favorites: Product[];
   userInfo: UserInfo | null;
-}
-
-
-const initialState: AppState = {
-  cart: localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')!) : [],
-  favorites: localStorage.getItem('favorites') ? JSON.parse(localStorage.getItem('favorites')!) : [],
-  userInfo: localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')!) : null,
 };
 
-// The Reducer function handles all state updates
-const appReducer = (state: AppState, action: Action): AppState => {
-  let newCart;
+type Action =
+  | { type: 'ADD_TO_CART'; payload: CartItem }
+  | { type: 'REMOVE_FROM_CART'; payload: { productId: string; size: string; color: string } }
+  | { type: 'UPDATE_CART_QUANTITY'; payload: { productId: string; size: string; color: string; quantity: number } }
+  | { type: 'CLEAR_CART' }
+  | { type: 'ADD_FAVORITE'; payload: Product }
+  | { type: 'REMOVE_FAVORITE'; payload: string }
+  | { type: 'USER_LOGIN'; payload: UserInfo }
+  | { type: 'USER_LOGOUT' };
+
+const appReducer = (state: State, action: Action): State => {
   switch (action.type) {
-   
-    case 'CART_ADD_ITEM': {
-        const newItem = action.payload;
-        const existItemIndex = state.cart.findIndex(
-        (item) =>
-            item.product._id === newItem.product._id && // _id check
-            item.size === newItem.size &&
-            item.color === newItem.color
-        );
-        if (existItemIndex > -1) {
-          newCart = state.cart.map((item, index) =>
-              index === existItemIndex ? { ...item, quantity: item.quantity + newItem.quantity } : item
-          );
-        } else {
-          newCart = [...state.cart, newItem];
-        }
-        localStorage.setItem('cartItems', JSON.stringify(newCart));
-        return { ...state, cart: newCart };
-    }
-    // --- ⛔️ Shothik Fix: Delete Button Logic ---
-    case 'CART_REMOVE_ITEM': {
-      const { productId, size, color } = action.payload;
-      newCart = state.cart.filter(
-        (item) => !(item.product._id === productId && item.size === size && item.color === color) // _id check
-      );
-      localStorage.setItem('cartItems', JSON.stringify(newCart));
-      return { ...state, cart: newCart };
-    }
-
-     case 'CART_UPDATE_QUANTITY': {
-      const { productId, size, color, quantity } = action.payload;
-      
-      newCart = state.cart.map((item) =>
-        item.product._id === productId && item.size === size && item.color === color
-          ? { ...item, quantity }
-          : item
-      ).filter(item => item.quantity > 0); 
-      
-      localStorage.setItem('cartItems', JSON.stringify(newCart));
-      return { ...state, cart: newCart };
-    }
-    case 'CART_CLEAR':
-      localStorage.removeItem('cartItems');
-      return { ...state, cart: [] };
-
-    // --- Favorites (using _id) ---
-    case 'FAVORITES_ADD_ITEM': {
+    // ... (Cart cases)
+    case 'ADD_TO_CART': {
       const newItem = action.payload;
-      const existItem = state.favorites.find((item) => item._id === newItem._id);
-      const newFavorites = existItem ? state.favorites : [...state.favorites, newItem];
-      localStorage.setItem('favorites', JSON.stringify(newFavorites));
-      return { ...state, favorites: newFavorites };
+      const existItem = state.cart.find(
+        (x) =>
+          x.product._id === newItem.product._id &&
+          x.size === newItem.size &&
+          x.color === newItem.color
+      );
+      if (existItem) {
+        return {
+          ...state,
+          cart: state.cart.map((x) =>
+            x.product._id === existItem.product._id &&
+            x.size === existItem.size &&
+            x.color === existItem.color
+              ? { ...x, quantity: x.quantity + newItem.quantity }
+              : x
+          ),
+        };
+      } else {
+        return { ...state, cart: [...state.cart, newItem] };
+      }
     }
-    case 'FAVORITES_REMOVE_ITEM': {
-      const productId = action.payload;
-      const newFavorites = state.favorites.filter((item) => item._id !== productId);
-      localStorage.setItem('favorites', JSON.stringify(newFavorites));
-      return { ...state, favorites: newFavorites };
+    case 'REMOVE_FROM_CART': {
+      const { productId, size, color } = action.payload;
+      return {
+        ...state,
+        cart: state.cart.filter(
+          (x) => !(x.product._id === productId && x.size === size && x.color === color)
+        ),
+      };
     }
+    case 'UPDATE_CART_QUANTITY': {
+      const { productId, size, color, quantity } = action.payload;
+      if (quantity <= 0) {
+        // Remove if quantity is 0 or less
+        return {
+          ...state,
+          cart: state.cart.filter(
+            (x) => !(x.product._id === productId && x.size === size && x.color === color)
+          ),
+        };
+      }
+      return {
+        ...state,
+        cart: state.cart.map((x) =>
+          x.product._id === productId && x.size === size && x.color === color
+            ? { ...x, quantity }
+            : x
+        ),
+      };
+    }
+    case 'CLEAR_CART':
+      return { ...state, cart: [] };
+    
+    // ... (Favorites cases)
+    case 'ADD_FAVORITE':
+      return { ...state, favorites: [...state.favorites, action.payload] };
+    case 'REMOVE_FAVORITE':
+      return {
+        ...state,
+        favorites: state.favorites.filter((p) => p._id !== action.payload),
+      };
 
-    // --- Auth ---
+    // ... (Auth cases)
     case 'USER_LOGIN':
-      localStorage.setItem('userInfo', JSON.stringify(action.payload));
       return { ...state, userInfo: action.payload };
     case 'USER_LOGOUT':
-      localStorage.removeItem('userInfo');
-      return { ...state, userInfo: null };
-
+      return { ...state, userInfo: null, cart: [], favorites: [] }; // Clear everything on logout
+      
     default:
       return state;
   }
 };
 
-// Create the context
-const AppContext = createContext<AppContextType | undefined>(undefined);
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+  const [storedCart, setStoredCart] = useLocalStorage<CartItem[]>('cart', []);
+  const [storedFavorites, setStoredFavorites] = useLocalStorage<Product[]>('favorites', []);
+  const [storedUser, setStoredUser] = useLocalStorage<UserInfo | null>('userInfo', null);
 
-// Create the Provider component
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const initialState: State = {
+    cart: storedCart || [],
+    favorites: storedFavorites || [],
+    userInfo: storedUser || null,
+  };
+
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-   const addToCart = (product: Product, size: string, color: string) => {
-    dispatch({ type: 'CART_ADD_ITEM', payload: { product, quantity: 1, size, color } });
+  // --- Cart Actions ---
+  const addToCart = (item: CartItem) => {
+    dispatch({ type: 'ADD_TO_CART', payload: item });
+    setStoredCart(state.cart); // This might be slightly delayed, but works
   };
-  
-
   const removeFromCart = (productId: string, size: string, color: string) => {
-    dispatch({ type: 'CART_REMOVE_ITEM', payload: { productId, size, color } });
+    dispatch({ type: 'REMOVE_FROM_CART', payload: { productId, size, color } });
+    setStoredCart(state.cart);
   };
-   const updateQuantity = (productId: string, size: string, color: string, quantity: number) => {
-    dispatch({ type: 'CART_UPDATE_QUANTITY', payload: { productId, size, color, quantity } });
+  const updateQuantity = (productId: string, size: string, color: string, quantity: number) => {
+    dispatch({ type: 'UPDATE_CART_QUANTITY', payload: { productId, size, color, quantity } });
+    setStoredCart(state.cart);
   };
-  
   const clearCart = () => {
-    dispatch({ type: 'CART_CLEAR' });
+    dispatch({ type: 'CLEAR_CART' });
+    setStoredCart([]);
   };
 
-  const addToFavorites = (product: Product) => {
-    dispatch({ type: 'FAVORITES_ADD_ITEM', payload: product });
+  // --- Favorites Actions ---
+  const addFavorite = (product: Product) => {
+    dispatch({ type: 'ADD_FAVORITE', payload: product });
+    setStoredFavorites(state.favorites);
   };
-  const removeFromFavorites = (productId: string) => {
-    dispatch({ type: 'FAVORITES_REMOVE_ITEM', payload: productId });
+  const removeFavorite = (productId: string) => {
+    dispatch({ type: 'REMOVE_FAVORITE', payload: productId });
+    setStoredFavorites(state.favorites);
   };
-   const isFavorite = (productId: string) => {
-    return state.favorites.some((item) => item._id === productId);
+  const isFavorite = (productId: string) => {
+    return state.favorites.some((p) => p._id === productId);
   };
 
-  const loginUser = (userData: UserInfo) => {
-    dispatch({ type: 'USER_LOGIN', payload: userData });
+  // --- Auth Actions ---
+  const login = (data: UserInfo) => {
+    dispatch({ type: 'USER_LOGIN', payload: data });
+    setStoredUser(data);
   };
-  const logoutUser = () => {
+  const logout = () => {
     dispatch({ type: 'USER_LOGOUT' });
+    setStoredUser(null);
+    setStoredCart([]);
+    setStoredFavorites([]);
   };
 
-  const contextValue: AppContextType = {
-    cart: state.cart,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    favorites: state.favorites,
-    addToFavorites,
-    removeFromFavorites,
-    isFavorite,
-    userInfo: state.userInfo,
-    loginUser,
-    logoutUser,
-  };
+  // Update localStorage whenever state changes
+  React.useEffect(() => {
+    setStoredCart(state.cart);
+  }, [state.cart, setStoredCart]);
 
-  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
+  React.useEffect(() => {
+    setStoredFavorites(state.favorites);
+  }, [state.favorites, setStoredFavorites]);
+  
+  React.useEffect(() => {
+    setStoredUser(state.userInfo);
+  }, [state.userInfo, setStoredUser]);
+
+
+  return (
+    <AppContext.Provider
+      value={{
+        cart: state.cart,
+        favorites: state.favorites,
+        userInfo: state.userInfo,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        addFavorite,
+        removeFavorite,
+        isFavorite,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
 };
 
-// Create the custom hook
-export const useAppContext = (): AppContextType => {
+export const useAppContext = () => {
   const context = useContext(AppContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;

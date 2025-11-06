@@ -1,71 +1,80 @@
 import React from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { ShoppingBag, Package, Users } from 'lucide-react'; // নতুন আইকন
+import { Link, useNavigate } from 'react-router-dom';
+import { User, ShoppingBag, List, LogOut, LayoutDashboard } from 'lucide-react';
 
 const AdminDashboardPage: React.FC = () => {
-  const { adminUserInfo, logoutAdmin } = useAppContext();
+  // Use the unified userInfo and logout
+  const { userInfo, logout } = useAppContext();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logoutAdmin();
-    navigate('/admin/login');
+    logout();
+    navigate('/login'); // Redirect to user login
   };
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        {adminUserInfo && (
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-700 hidden sm:block">
-              Welcome, <span className="font-semibold">{adminUserInfo.name}</span>
-            </span>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
+    <div className="flex">
+      {/* Sidebar Navigation */}
+      <nav className="w-64 min-h-screen bg-gray-800 text-white p-5">
+        <h2 className="text-2xl font-bold mb-10 text-brand-primary">Admin Panel</h2>
+        <ul className="space-y-4">
+          <li>
+            <Link to="/admin/dashboard" className="flex items-center p-2 rounded bg-gray-700">
+              <LayoutDashboard size={18} className="mr-3" />
+              Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/orders" className="flex items-center p-2 rounded hover:bg-gray-700">
+              <ShoppingBag size={18} className="mr-3" />
+              Orders
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/products" className="flex items-center p-2 rounded hover:bg-gray-700">
+              <List size={18} className="mr-3" />
+              Products
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/users" className="flex items-center p-2 rounded hover:bg-gray-700">
+              <User size={18} className="mr-3" />
+              Users (Soon)
+            </Link>
+          </li>
+        </ul>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center p-2 rounded hover:bg-red-700 mt-10 text-red-300"
+        >
+          <LogOut size={18} className="mr-3" />
+          Logout
+        </button>
+      </nav>
 
-      {}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Main Content */}
+      <main className="flex-1 p-10 bg-gray-100">
+        <h1 className="text-3xl font-bold mb-6">Welcome, {userInfo?.name}!</h1>
         
-        {}
-        <NavLink 
-          to="/admin/products" 
-          className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
-        >
-          <Package size={48} className="text-brand-accent mb-4" />
-          <h2 className="text-2xl font-semibold">Manage Products</h2>
-          <p className="text-gray-600">View, create, edit, and delete products</p>
-        </NavLink>
-
-        {}
-        <NavLink 
-          to="/admin/orders"
-          className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
-        >
-          <ShoppingBag size={48} className="text-blue-500 mb-4" />
-          <h2 className="text-2xl font-semibold">Manage Orders</h2>
-          <p className="text-gray-600">View and process customer orders</p>
-        </NavLink>
-
-        {}
-        <NavLink 
-          to="/admin/users"
-          className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
-        >
-          <Users size={48} className="text-green-500 mb-4" />
-          <h2 className="text-2xl font-semibold">Manage Users</h2>
-          <p className="text-gray-600">View and manage users</p>
-        </NavLink>
-
-      </div>
-      {}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Total Sales</h3>
+            <p className="text-3xl font-bold text-green-600">৳0</p>
+            <p className="text-gray-500">(Stats coming soon)</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Total Orders</h3>
+            <p className="text-3xl font-bold text-blue-600">0</p>
+            <p className="text-gray-500">(Stats coming soon)</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Total Products</h3>
+            <p className="text-3xl font-bold text-purple-600">0</p>
+            <p className="text-gray-500">(Stats coming soon)</p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
