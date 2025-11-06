@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingCart, User, Menu, X, LayoutDashboard, LogOut, UserCircle } from 'lucide-react'; // Added UserCircle
+import { Heart, ShoppingCart, User, Menu, X, LayoutDashboard, LogOut, UserCircle } from 'lucide-react'; 
 import { useAppContext } from '../context/AppContext';
 
 const Navbar: React.FC = () => {
-  // --- ⛔️ Use userInfo and logoutUser ---
+  
   const { cart, favorites, userInfo, logoutUser } = useAppContext();
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     logoutUser();
     setIsUserDropdownOpen(false);
-    navigate('/login'); // Send everyone to login page after logout
+    navigate('/login'); 
   };
 
   useEffect(() => {
@@ -69,7 +69,6 @@ const Navbar: React.FC = () => {
                 )}
               </NavLink>
 
-              {/* --- ⛔️ User Icon Logic Updated --- */}
               <div className="relative" ref={dropdownRef}>
                 {userInfo ? (
                   // If logged in (Admin or User)
@@ -86,7 +85,7 @@ const Navbar: React.FC = () => {
                   </NavLink>
                 )}
 
-                {/* --- Dropdown Menu (Handles both Admin and User) --- */}
+             
                 {userInfo && isUserDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
                     <div className="px-4 py-2 text-sm text-gray-700 border-b">
@@ -125,7 +124,7 @@ const Navbar: React.FC = () => {
                   </div>
                 )}
               </div>
-              {/* --- User Icon Logic End --- */}
+             
 
               {/* Cart */}
               <NavLink to="/checkout" className={({ isActive }) => `relative text-gray-600 hover:text-brand-accent transition-colors duration-300 ${isActive ? 'text-brand-accent' : ''}`}>
@@ -134,7 +133,7 @@ const Navbar: React.FC = () => {
                   <span className="absolute -top-2 -right-2 bg-brand-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{cartItemCount}</span>
                 )}
               </NavLink>
-            </div> {/* End Desktop Icons */}
+            </div> 
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
@@ -142,8 +141,8 @@ const Navbar: React.FC = () => {
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
             </div>
-          </div> {/* End Icons container */}
-        </div> {/* End flex justify-between */}
+          </div> 
+        </div> 
       </nav>
 
       {/* --- Mobile Menu --- */}
@@ -155,10 +154,10 @@ const Navbar: React.FC = () => {
               {/* Mobile Favorites */}
               <NavLink to="/favorites" className={({ isActive }) => `relative text-gray-600 hover:text-brand-accent transition-colors duration-300 ${isActive ? 'text-brand-accent' : ''}`} onClick={() => setIsMenuOpen(false)}>
                 <Heart size={24} />
-                 {/* Count removed for simplicity */}
+           
               </NavLink>
 
-              {/* --- Mobile User Icon Logic --- */}
+              
               {userInfo ? (
                  userInfo.isAdmin ? (
                      <NavLink to="/admin/dashboard" className={({ isActive }) => `text-gray-600 hover:text-brand-accent ${isActive ? 'text-brand-accent' : ''}`} onClick={() => setIsMenuOpen(false)}>

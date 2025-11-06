@@ -145,5 +145,5 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-// --- ⛔️ Make sure this line exists! ---
+
 export default RegisterPage;

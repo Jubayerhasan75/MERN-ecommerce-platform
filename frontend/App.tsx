@@ -15,8 +15,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminRoute from './components/AdminRoute';
 import AdminProductListPage from './pages/AdminProductListPage';
 import AdminProductEditPage from './pages/AdminProductEditPage';
-import AdminOrderListPage from './pages/AdminOrderListPage'; // ⛔️ Notun Import
-import AdminOrderDetailPage from './pages/AdminOrderDetailPage'; // ⛔️ Notun Import
+import AdminOrderListPage from './pages/AdminOrderListPage'; 
+import AdminOrderDetailPage from './pages/AdminOrderDetailPage';
 
 // Auth Imports
 import LoginPage from './pages/LoginPage';
@@ -24,7 +24,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Shomadhan: Admin User List Page-er jonno placeholder
+
 const AdminUserListPage = () => <div className="p-10 text-center text-xl">Admin Users Page - Coming Soon!</div>;
 
 function App() {
@@ -53,18 +53,18 @@ function App() {
               {/* --- Protected User Routes --- */}
               <Route path="" element={<ProtectedRoute />}>
                  <Route path="/profile" element={<ProfilePage />} />
-                 {/* ⛔️ User ebong Admin ubhoye-i nijer Order ID diye details dekhte parbe */}
+                 {}
                  <Route path="/order/:id" element={<AdminOrderDetailPage />} /> 
               </Route>
 
-              {/* --- Protected Admin Routes --- */}
+              {}
               <Route path="" element={<AdminRoute />}>
                 <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="/admin/products" element={<AdminProductListPage />} />
                 <Route path="/admin/product/edit/:id" element={<AdminProductEditPage />} />
                 <Route path="/admin/product/new/edit" element={<AdminProductEditPage />} />
                 
-                {/* --- ⛔️ Shothik Fix: Admin Order Route-gulo add kora holo --- */}
+                {}
                 <Route path="/admin/orders" element={<AdminOrderListPage />} />
                 <Route path="/admin/order/:id" element={<AdminOrderDetailPage />} /> 
                 

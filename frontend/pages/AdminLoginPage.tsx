@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext'; // <-- ১. AppContext ইম্পোর্ট করুন
-
+import { useAppContext } from '../context/AppContext'; 
 const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  // --- ⛔️ পরিবর্তন এখানে ---
-  // AppContext থেকে loginAdmin এবং adminUserInfo ফাংশনটি নিন
-  const { loginAdmin, adminUserInfo } = useAppContext(); 
-  // --- পরিবর্তন শেষ ---
 
-  // এই Effect-টি চেক করবে ইউজার আগে থেকেই লগইন করা আছে কি না
+  const { loginAdmin, adminUserInfo } = useAppContext(); 
+
+
+  
   useEffect(() => {
     if (adminUserInfo) {
-      // যদি লগইন করা থাকে, তাকে '/admin/dashboard' পেজে পাঠিয়ে দিন
+     
       navigate('/admin/dashboard');
     }
-  }, [adminUserInfo, navigate]); // adminUserInfo বা navigate পরিবর্তন হলে এটি রান হবে
-
+  }, [adminUserInfo, navigate]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -41,20 +38,18 @@ const AdminLoginPage: React.FC = () => {
         throw new Error(data.message || 'Login failed');
       }
       
-      // --- ⛔️ পরিবর্তন এখানে ---
-      // ৩. localStorage-এর বদলে Context-এর loginAdmin ফাংশন কল করুন
-      // useLocalStorage হুকটি নিজে থেকেই এটি localStorage-এ সেভ করে নেবে
+      
       loginAdmin(data); 
-      // --- পরিবর্তন শেষ ---
+    -
 
-      navigate('/admin/dashboard'); // ৪. ড্যাশবোর্ডে পাঠান
+      navigate('/admin/dashboard');
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
-  // --- (নিচের JSX কোডটি অপরিবর্তিত আছে) ---
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">

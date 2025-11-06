@@ -13,19 +13,18 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const { userInfo, loginUser } = useAppContext();
 
-  // --- ⛔️ Redirect Logic (লুপ এড়ানোর জন্য) ---
+
   useEffect(() => {
-    // যদি userInfo লোড হয় এবং ইউজার লগইন করা থাকে
+    
     if (userInfo) {
       if (userInfo.isAdmin) {
-        // অ্যাডমিন হলে ড্যাশবোর্ডে পাঠাও
+      
         navigate('/admin/dashboard', { replace: true });
       } else {
-        // সাধারণ ইউজার হলে হোমপেজে পাঠাও
         navigate('/', { replace: true });
       }
     }
-    // যদি userInfo null হয় (লগআউট), তাহলে এই পেজেই থাকো, কিছু করো না।
+
   }, [userInfo, navigate]);
 
 
@@ -46,9 +45,6 @@ const LoginPage: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
-
-      // --- ⛔️ শুধু loginUser কল করা হবে ---
-      // স্টেট আপডেট করো। useEffect নিজে থেকেই রিডাইরেক্ট করবে।
       loginUser(data);
       setLoading(false);
 
@@ -60,7 +56,7 @@ const LoginPage: React.FC = () => {
 
   const isAdminLoginPath = location.pathname === '/admin/login';
 
-  // যদি ইউজার লগইন করা থাকে, রিডাইরেক্ট হওয়ার আগ পর্যন্ত লোডার দেখাও
+ 
   if (userInfo) {
       return <div className="flex justify-center items-center min-h-[60vh]"><Loader2 className="animate-spin h-8 w-8 text-brand-accent"/></div>;
   }
@@ -106,7 +102,7 @@ const LoginPage: React.FC = () => {
               />
             </div>
           </div>
-          <div className="h-6"> {/* খালি জায়গা ताकि register লিঙ্ক না থাকলে ফর্ম না লাফায় */}
+          <div className="h-6"> {}
             {!isAdminLoginPath && (
               <div className="text-sm text-center">
                   <Link to="/register" className="font-medium text-brand-accent hover:text-brand-accent-dark">

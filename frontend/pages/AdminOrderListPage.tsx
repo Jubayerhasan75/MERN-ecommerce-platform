@@ -20,10 +20,9 @@ const AdminOrderListPage: React.FC = () => {
       }
       try {
         setLoading(true);
-        // ⛔️ Shothik Fix: Admin hishebe shob order fetch kora
         const response = await fetch('http://localhost:5000/api/orders', {
           headers: {
-            'Authorization': `Bearer ${userInfo.token}`, // Token pathano
+            'Authorization': `Bearer ${userInfo.token}`,
           },
         });
         if (!response.ok) {
@@ -86,7 +85,7 @@ const AdminOrderListPage: React.FC = () => {
                     <Link to={`/admin/order/${order._id}`} className="text-blue-600 hover:text-blue-800">
                       <Eye size={18} className="inline mr-1" /> Details
                     </Link>
-                    {/* Delete button ekhane add kora jete pare, kintu details page-e rakha-i bhalo */}
+                    {}
                   </td>
                 </tr>
               ))}

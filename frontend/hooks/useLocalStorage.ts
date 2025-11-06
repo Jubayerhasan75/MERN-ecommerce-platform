@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// Fix: The return type explicitly uses React.Dispatch and React.SetStateAction, which requires 'React' to be in scope.
 export function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {

@@ -26,11 +26,11 @@ const ProfilePage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        // ⛔️ Shothik Fix: /myorders route theke fetch kora
+       
         const response = await fetch('http://localhost:5000/api/orders/myorders', {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userInfo.token}`, // Token pathano
+            'Authorization': `Bearer ${userInfo.token}`,
           },
         });
         if (!response.ok) {
@@ -84,7 +84,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Column 2: Order History */}
+        {}
         <div className="md:col-span-2">
           <h2 className="text-2xl sm:text-3xl font-bold mb-6">Order History</h2>
           <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md space-y-6">
@@ -93,7 +93,7 @@ const ProfilePage: React.FC = () => {
             ) : error ? (
               <div className="text-center text-red-500">{error}</div>
             ) : orders.length === 0 ? (
-              // ⛔️ Ei message-ti ekhon shudhu order na thaklei dekhabe
+              
               <div className="text-center text-gray-500 py-8">You have not placed any orders yet.</div>
             ) : (
               <div className="space-y-4">

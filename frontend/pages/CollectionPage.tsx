@@ -42,7 +42,7 @@ const CollectionPage: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Unique color list ber kora
+ 
   const allColors = useMemo(() => {
     const colors = new Set<string>();
     products.forEach(product => {
@@ -81,15 +81,14 @@ const CollectionPage: React.FC = () => {
   const endIndex = startIndex + PRODUCTS_PER_PAGE;
   const productsForCurrentPage = sortedProducts.slice(startIndex, endIndex);
 
-  // --- ⛔️ Shothik Fix (Bug #5): Page Change-er Shoy Scroll to Top ---
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
       
-      // Ei line-ti page-ke scroll kore shobar opore niye jabe
+      
       window.scrollTo({
         top: 0,
-        behavior: 'smooth' // "smooth" effect-er jonno
+        behavior: 'smooth'
       });
     }
   };
@@ -120,7 +119,7 @@ const CollectionPage: React.FC = () => {
                     checked={selectedCategory === category}
                     onChange={(e) => {
                       setSelectedCategory(e.target.value);
-                      setCurrentPage(1); // Filter change korle 1st page-e ferot jabe
+                      setCurrentPage(1); 
                     }}
                     className="h-4 w-4 text-brand-accent focus:ring-brand-accent border-gray-300"
                   />
@@ -139,7 +138,7 @@ const CollectionPage: React.FC = () => {
               value={selectedColor}
               onChange={(e) => {
                 setSelectedColor(e.target.value);
-                setCurrentPage(1); // Filter change korle 1st page-e ferot jabe
+                setCurrentPage(1);
               }}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand-accent focus:border-brand-accent"
             >
@@ -160,7 +159,7 @@ const CollectionPage: React.FC = () => {
               value={priceRange}
               onChange={(e) => {
                 setPriceRange(Number(e.target.value));
-                setCurrentPage(1); // Filter change korle 1st page-e ferot jabe
+                setCurrentPage(1); 
               }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-dark"
             />
@@ -177,7 +176,7 @@ const CollectionPage: React.FC = () => {
               value={sortBy}
               onChange={(e) => {
                 setSortBy(e.target.value);
-                setCurrentPage(1); // Filter change korle 1st page-e ferot jabe
+                setCurrentPage(1);
               }}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand-accent focus:border-brand-accent"
             >
@@ -192,14 +191,14 @@ const CollectionPage: React.FC = () => {
         <main className="lg:col-span-3">
           {productsForCurrentPage.length > 0 ? (
             <div>
-              {/* Product Card-gulo ekhon ekhane show korbe */}
+              {}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
                 {productsForCurrentPage.map(product => (
                   <ProductCard key={product._id} product={product} />
                 ))}
               </div>
 
-              {/* Pagination Buttons */}
+              {}
               {totalPages > 1 && (
                 <div className="flex justify-center items-center space-x-4 mt-12">
                   <button

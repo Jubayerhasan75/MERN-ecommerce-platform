@@ -1,34 +1,33 @@
-import React, { useState, useEffect } from 'react'; // <-- useState, useEffect ইম্পোর্ট করুন
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-// import { products } from '../data/products'; // <-- এই পুরনো লাইনটি ডিলিট করুন
-import { fetchProducts } from '../data/products'; // <-- এই নতুন লাইনটি অ্যাড করুন
-import { Product } from '../types'; // <-- Product টাইপ ইম্পোর্ট করুন
+
+import { fetchProducts } from '../data/products'; 
+import { Product } from '../types'; 
 import homeImg from '../assets/home.png'; 
 
 const HomePage: React.FC = () => {
-  // --- নতুন কোড শুরু ---
+ 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const data = await fetchProducts(); // ব্যাকএন্ড থেকে ডেটা আনুন
+      const data = await fetchProducts();
       setProducts(data);
       setLoading(false);
     };
     loadProducts();
   }, []);
-  // --- নতুন কোড শেষ ---
 
-  // এই লাইনটি এখন state থেকে ডেটা নিচ্ছে, যা সঠিক
+  
   const featuredProducts = products.slice(0, 5);
 
   return (
     <div>
-      {/* Hero Section (এটি অপরিবর্তিত থাকবে) */}
+      {}
       <section
         className="relative h-[60vh] md:h-[80vh] bg-cover bg-center flex items-center justify-center text-white"
         style={{ backgroundImage: `url(${homeImg})` }} 
@@ -65,24 +64,24 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Main Collection Section (এখানে সামান্য পরিবর্তন হয়েছে) */}
+      {}
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-10">Main Collection</h2>
           
-          {/* --- পরিবর্তন শুরু --- */}
-          {/* ডেটা লোড হওয়ার সময় একটি মেসেজ দেখান */}
+          {}
+          {}
           {loading ? (
             <div className="text-center">Loading products...</div>
           ) : (
-            // ডেটা লোড হওয়ার পর প্রোডাক্ট দেখান
+          
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {featuredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}
-          {/* --- পরিবর্তন শেষ --- */}
+          {}
 
           <div className="text-center mt-12">
             <Link to="/collection">

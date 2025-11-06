@@ -1,6 +1,6 @@
 import React from 'react';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
-import { Link } from 'react-router-dom'; // <-- ১. Link ইম্পোর্ট করুন
+import { Link } from 'react-router-dom'; 
 
 const Footer: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
           </div>
           <div>
             <h4 className="font-semibold text-white mb-4">Quick Links</h4>
-            {/* --- ⛔️ পরিবর্তন এখানে --- */}
+           
             <ul className="space-y-2 text-sm">
               <li><Link to="/collection" className="hover:text-brand-accent transition-colors">Collection</Link></li>
               <li><Link to="/about" className="hover:text-brand-accent transition-colors">About Us</Link></li>
@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
           </div>
           <div>
             <h4 className="font-semibold text-white mb-4">Customer Service</h4>
-            {/* --- ⛔️ পরিবর্তন এখানে --- */}
+          
             <ul className="space-y-2 text-sm">
               <li><Link to="/shipping" className="hover:text-brand-accent transition-colors">Shipping & Returns</Link></li>
               <li><Link to="/privacy" className="hover:text-brand-accent transition-colors">Privacy Policy</Link></li>
@@ -35,7 +35,7 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold text-white mb-4">Follow Us</h4>
             <div className="flex space-x-4">
-              {/* সোশ্যাল মিডিয়া লিঙ্ক 'a' ট্যাগেই থাকবে, কারণ এগুলো বাইরের লিঙ্ক */}
+              {/* social*/}
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent transition-colors"><Facebook size={20} /></a>
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent transition-colors"><Instagram size={20} /></a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent transition-colors"><Twitter size={20} /></a>

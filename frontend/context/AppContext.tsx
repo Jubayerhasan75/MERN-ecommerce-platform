@@ -19,7 +19,7 @@ interface AppState {
   userInfo: UserInfo | null;
 }
 
-// Load initial state from Local Storage
+
 const initialState: AppState = {
   cart: localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')!) : [],
   favorites: localStorage.getItem('favorites') ? JSON.parse(localStorage.getItem('favorites')!) : [],
@@ -30,7 +30,7 @@ const initialState: AppState = {
 const appReducer = (state: AppState, action: Action): AppState => {
   let newCart;
   switch (action.type) {
-    // --- ⛔️ Shothik Fix: Cart shob _id diye check korbe ---
+   
     case 'CART_ADD_ITEM': {
         const newItem = action.payload;
         const existItemIndex = state.cart.findIndex(
@@ -58,15 +58,15 @@ const appReducer = (state: AppState, action: Action): AppState => {
       localStorage.setItem('cartItems', JSON.stringify(newCart));
       return { ...state, cart: newCart };
     }
-    // --- ⛔️ Shothik Fix: Increase/Decrease Button Logic ---
+
      case 'CART_UPDATE_QUANTITY': {
       const { productId, size, color, quantity } = action.payload;
-      // Jodi quantity komate komate 0 hoy, tahole auto-delete hobe
+      
       newCart = state.cart.map((item) =>
         item.product._id === productId && item.size === size && item.color === color
           ? { ...item, quantity }
           : item
-      ).filter(item => item.quantity > 0); // Shudhu 0-er cheye beshi quantity rakho
+      ).filter(item => item.quantity > 0); 
       
       localStorage.setItem('cartItems', JSON.stringify(newCart));
       return { ...state, cart: newCart };
@@ -114,7 +114,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     dispatch({ type: 'CART_ADD_ITEM', payload: { product, quantity: 1, size, color } });
   };
   
-  // --- ⛔️ Shothik Fix: Ei function-gulo ekhon dispatch korbe ---
+
   const removeFromCart = (productId: string, size: string, color: string) => {
     dispatch({ type: 'CART_REMOVE_ITEM', payload: { productId, size, color } });
   };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Product } from '../types';
-import { Loader2, Heart, ShoppingBag } from 'lucide-react';
+import { Loader2, Heart, ShoppingBag } from 'lucide-react'; // ShoppingBag icon import
 import { useAppContext } from '../context/AppContext';
 
 const ProductDetailPage: React.FC = () => {
@@ -39,6 +39,7 @@ const ProductDetailPage: React.FC = () => {
     fetchProduct();
   }, [id]);
   
+  // --- Helper function (Size/Color check korar jonno) ---
   const validateSelection = (): boolean => {
     if (product) {
       if (product.sizes && product.sizes.length > 0 && !selectedSize) {
@@ -53,6 +54,7 @@ const ProductDetailPage: React.FC = () => {
     return true;
   };
 
+  // --- "Add to Cart" button-er kaj ---
   const handleAddToCart = () => {
     if (product && validateSelection()) {
       const size = (product.sizes && product.sizes.length > 0) ? selectedSize : 'One Size';
@@ -62,11 +64,15 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+
   const handleOrderNow = () => {
     if (product && validateSelection()) {
       const size = (product.sizes && product.sizes.length > 0) ? selectedSize : 'One Size';
       const color = (product.colors && product.colors.length > 0) ? selectedColor : 'Default';
+      
+   
       addToCart(product, size, color);
+     
       navigate('/checkout');
     }
   };
@@ -81,9 +87,6 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
-  // --- ⛔️ Shothik "0 Price" Bug Fix (Notun Logic) ---
-  const showDiscount = product && product.originalPrice && product.originalPrice > product.price;
-
   if (loading) return <div className="p-20 text-center"><Loader2 size={48} className="animate-spin text-brand-accent" /></div>;
   if (error) return <div className="p-20 text-center text-red-500">{error}</div>;
   if (!product) return <div className="p-20 text-center text-gray-500">Product not found.</div>;
@@ -91,8 +94,14 @@ const ProductDetailPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+        
+        {}
         <div className="bg-white p-4 rounded-lg shadow-md sticky top-24">
-          <img src={product.imageUrl} alt={product.name} className="w-full h-auto object-cover rounded-lg" />
+          <img 
+            src={product.imageUrl} 
+            alt={product.name} 
+            className="w-full h-auto object-cover rounded-lg" // Image-o rounded
+          />
         </div>
 
         <div className="space-y-6">
@@ -102,15 +111,14 @@ const ProductDetailPage: React.FC = () => {
             <div className="flex items-baseline space-x-2">
               <p className="text-3xl font-bold text-brand-dark">৳{product.price}</p>
               
-              {/* Notun Logic Use */}
-              {showDiscount && (
+              {/* "0" Bug Fix Logic (Bonus) */}
+              {product.originalPrice && product.originalPrice > product.price && (
                 <p className="text-2xl text-gray-400 line-through">৳{product.originalPrice}</p>
               )}
             </div>
-            {/* Notun Logic Use */}
-            {showDiscount && (
+            {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-sm font-semibold bg-red-100 text-red-600 px-3 py-1 rounded-full">
-                {Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}% OFF
+                {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
               </span>
             )}
           </div>
@@ -165,7 +173,7 @@ const ProductDetailPage: React.FC = () => {
             </div>
           )}
 
-          {/* Buttons */}
+          {/* --- Buttons --- */}
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
               onClick={handleAddToCart}
@@ -174,6 +182,8 @@ const ProductDetailPage: React.FC = () => {
             >
               Add to Cart
             </button>
+            
+            {}
             <button
               onClick={handleOrderNow}
               disabled={product.countInStock === 0}
@@ -182,6 +192,7 @@ const ProductDetailPage: React.FC = () => {
               <ShoppingBag size={20} />
               Order Now
             </button>
+            
             <button
               onClick={handleFavoriteToggle}
               className={`px-5 py-3 border border-gray-300 rounded-lg shadow-sm

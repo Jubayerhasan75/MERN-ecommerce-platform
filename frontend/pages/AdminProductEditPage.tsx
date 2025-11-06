@@ -3,11 +3,11 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, Upload } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
-// --- ⛔️ Shothik Fix (Bug #2): Notun Product interface (originalPrice optional) ---
+
 interface ProductData {
   name: string;
   price: number;
-  originalPrice?: number; // Ekhon '?' (optional)
+  originalPrice?: number; 
   imageUrl: string;
   category: string;
   description: string;
@@ -40,7 +40,7 @@ const AdminProductEditPage: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      // --- "Edit" Mode ---
+     
       setIsNewProduct(false);
       setLoading(true);
       const fetchProduct = async () => {
@@ -67,11 +67,11 @@ const AdminProductEditPage: React.FC = () => {
       };
       fetchProduct();
     } else {
-      // --- "Add Product" Mode ---
+    
       setIsNewProduct(true);
       setName('Sample Name');
       setPrice(850);
-      setOriginalPrice(0); // Shurute 0 thakbe
+      setOriginalPrice(0);
       setCategory('Slim Fit');
       setDescription('Sample Description');
       setCountInStock(10);
@@ -121,8 +121,7 @@ const AdminProductEditPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    // --- ⛔️ Shothik "0 Price" Bug Fix (Notun Logic) ---
-    // 1. Prothome productData object toiri kora (originalPrice chara)
+    
     const productData: ProductData = {
       name,
       price: Number(price),
@@ -134,12 +133,11 @@ const AdminProductEditPage: React.FC = () => {
       sizes: sizes.split(',').map(s => s.trim()).filter(Boolean),
     };
 
-    // 2. Shudhu tokhoni originalPrice add koro jodi er man thake EBONG price theke boro hoy
+   
     if (originalPrice && Number(originalPrice) > Number(price)) {
       productData.originalPrice = Number(originalPrice);
     }
-    // (Jodi na hoy, tahole "originalPrice" field-ti object-ei thakbe na, fole database-e "undefined" hishebe jabe)
-    // --- Notun Logic Shesh ---
+    
 
     try {
       let response;
