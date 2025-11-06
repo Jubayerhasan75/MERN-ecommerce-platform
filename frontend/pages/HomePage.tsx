@@ -1,96 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Product } from '../types';
+import { Loader2 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-
-import { fetchProducts } from '../data/products'; 
-import { Product } from '../types'; 
-import homeImg from '../assets/home.png'; 
+import homeImg from '../assets/home.png'; // This line will now work
 
 const HomePage: React.FC = () => {
- 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      setLoading(true);
-      const data = await fetchProducts();
-      setProducts(data);
-      setLoading(false);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        // Get only the first 4 products for the homepage
+        setProducts(data.slice(0, 4));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
     };
-    loadProducts();
+    fetchProducts();
   }, []);
 
-  
-  const featuredProducts = products.slice(0, 5);
-
   return (
-    <div>
-      {}
-      <section
-        className="relative h-[60vh] md:h-[80vh] bg-cover bg-center flex items-center justify-center text-white"
-        style={{ backgroundImage: `url(${homeImg})` }} 
-      >
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative z-10 text-center p-4">
-          <motion.h1
-            className="text-4xl md:text-6xl font-bold mb-4 tracking-tight"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative w-full h-[50vh] md:h-[80vh] bg-gray-900 text-white">
+        <img
+          src={homeImg}
+          alt="Hero Background"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center p-4">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">New Collection is Here</h1>
+          <p className="text-lg md:text-xl mb-8">Discover the latest trends in T-shirts.</p>
+          <a
+            href="/collection"
+            className="px-8 py-3 bg-brand-primary text-gray-900 font-semibold rounded-md hover:bg-opacity-80 transition-colors"
           >
-            Up to 70% OFF on Premium T-Shirts
-          </motion.h1>
-          <motion.p
-            className="text-lg md:text-2xl mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Starts from ৳300 only!
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Link to="/collection">
-              <button className="bg-brand-accent text-white font-semibold py-3 px-8 rounded-lg text-lg hover:bg-brand-accent-dark transition-colors duration-300 transform hover:scale-105">
-                Shop Now
-              </button>
-            </Link>
-          </motion.div>
+            Shop Now
+          </a>
         </div>
       </section>
 
-      {}
-      <section className="py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-10">Main Collection</h2>
-          
-          {}
-          {}
-          {loading ? (
-            <div className="text-center">Loading products...</div>
-          ) : (
-          
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {featuredProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
-          {}
-
-          <div className="text-center mt-12">
-            <Link to="/collection">
-              <button className="bg-brand-dark text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-700 transition-colors duration-300">
-                View All Products
-              </button>
-            </Link>
+      {/* Featured Products Section */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-10">Featured Products</h2>
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <Loader2 size={40} className="animate-spin" />
           </div>
-        </div>
+        ) : error ? (
+          <div className="text-center text-red-500">{error}</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.map((product) => (
+              // This is the fix: Use product._id, not product.id
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

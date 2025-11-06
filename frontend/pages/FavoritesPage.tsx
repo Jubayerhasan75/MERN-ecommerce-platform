@@ -1,31 +1,26 @@
-
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import ProductCard from '../components/ProductCard';
-import { Link } from 'react-router-dom';
-import { HeartCrack } from 'lucide-react';
+import { HeartOff } from 'lucide-react';
 
 const FavoritesPage: React.FC = () => {
   const { favorites } = useAppContext();
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-[60vh]">
-      <h1 className="text-3xl font-bold text-center mb-10">Your Favorites</h1>
-      {favorites.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {favorites.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+    <div className="container mx-auto px-4 py-12 min-h-[70vh]">
+      <h1 className="text-3xl font-bold mb-8">My Favorites</h1>
+      {favorites.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-gray-500 h-64">
+          <HeartOff size={48} className="mb-4" />
+          <p className="text-xl">You have no favorite items yet.</p>
+          <p>Click the heart on any product to save it here.</p>
         </div>
       ) : (
-        <div className="text-center py-20">
-          <HeartCrack className="mx-auto text-gray-300 w-20 h-20 mb-4" />
-          <p className="text-xl text-gray-500 mb-4">You haven't added any favorites yet.</p>
-          <Link to="/collection">
-             <button className="bg-brand-accent text-white font-semibold py-3 px-8 rounded-lg hover:bg-brand-accent-dark transition-colors duration-300">
-                Start Exploring
-            </button>
-          </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {favorites.map((product) => (
+            // This is the fix: Use product._id, not product.id
+            <ProductCard key={product._id} product={product} />
+          ))}
         </div>
       )}
     </div>

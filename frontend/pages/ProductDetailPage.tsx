@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Product } from '../types';
-import { Loader2, Heart, ShoppingBag } from 'lucide-react'; // ShoppingBag icon import
+import { Loader2, Heart, ShoppingCart } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart, isFavorite, addToFavorites, removeFromFavorites } = useAppContext();
-
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
+  // State for selection
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectionError, setSelectionError] = useState<string>('');
+
+  // This is the fix: Use new function names
+  const { addToCart, addFavorite, removeFavorite, isFavorite } = useAppContext();
   
-  const favorite = product ? isFavorite(product._id) : false;
+  const isFav = product ? isFavorite(product._id) : false;
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,8 +29,9 @@ const ProductDetailPage: React.FC = () => {
         if (!response.ok) {
           throw new Error('Product not found');
         }
-        const data: Product = await response.json();
+        const data = await response.json();
         setProduct(data);
+        // Set default size and color if available
         if (data.sizes && data.sizes.length > 0) setSelectedSize(data.sizes[0]);
         if (data.colors && data.colors.length > 0) setSelectedColor(data.colors[0]);
       } catch (err) {
@@ -38,167 +42,162 @@ const ProductDetailPage: React.FC = () => {
     };
     fetchProduct();
   }, [id]);
-  
-  // --- Helper function (Size/Color check korar jonno) ---
-  const validateSelection = (): boolean => {
-    if (product) {
-      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-        alert('Please select a size.'); 
-        return false;
-      }
-      if (product.colors && product.colors.length > 0 && !selectedColor) {
-        alert('Please select a color.'); 
-        return false;
-      }
+
+  const validateSelection = () => {
+    if (!selectedSize) {
+      setSelectionError('Please select a size.');
+      return false;
     }
+    if (!selectedColor) {
+      setSelectionError('Please select a color.');
+      return false;
+    }
+    setSelectionError('');
     return true;
   };
 
-  // --- "Add to Cart" button-er kaj ---
   const handleAddToCart = () => {
     if (product && validateSelection()) {
-      const size = (product.sizes && product.sizes.length > 0) ? selectedSize : 'One Size';
-      const color = (product.colors && product.colors.length > 0) ? selectedColor : 'Default';
-      addToCart(product, size, color);
-      alert(`${product.name} added to cart!`);
+      // This is the fix: Pass a single CartItem object
+      addToCart({
+        product,
+        quantity: 1,
+        size: selectedSize,
+        color: selectedColor,
+      });
+      // Optional: Show a success message
     }
   };
-
 
   const handleOrderNow = () => {
     if (product && validateSelection()) {
-      const size = (product.sizes && product.sizes.length > 0) ? selectedSize : 'One Size';
-      const color = (product.colors && product.colors.length > 0) ? selectedColor : 'Default';
-      
-   
-      addToCart(product, size, color);
-     
-      navigate('/checkout');
+      // This is the fix: Pass a single CartItem object
+      addToCart({
+        product,
+        quantity: 1,
+        size: selectedSize,
+        color: selectedColor,
+      });
+      navigate('/checkout'); // Redirect to checkout
     }
   };
-
-  const handleFavoriteToggle = () => {
+  
+  const handleFavoriteClick = () => {
     if (product) {
-      if (favorite) {
-        removeFromFavorites(product._id);
+      if (isFav) {
+        removeFavorite(product._id);
       } else {
-        addToFavorites(product);
+        addFavorite(product);
       }
     }
   };
 
-  if (loading) return <div className="p-20 text-center"><Loader2 size={48} className="animate-spin text-brand-accent" /></div>;
-  if (error) return <div className="p-20 text-center text-red-500">{error}</div>;
-  if (!product) return <div className="p-20 text-center text-gray-500">Product not found.</div>;
+  if (loading) return <div className="p-10 text-center"><Loader2 size={40} className="animate-spin" /></div>;
+  if (error) return <div className="p-10 text-center text-red-500">{error}</div>;
+  if (!product) return <div className="p-10 text-center text-gray-500">Product not found.</div>;
+
+  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-        
-        {}
-        <div className="bg-white p-4 rounded-lg shadow-md sticky top-24">
-          <img 
-            src={product.imageUrl} 
-            alt={product.name} 
-            className="w-full h-auto object-cover rounded-lg" // Image-o rounded
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Product Image */}
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-auto object-cover rounded-lg"
           />
         </div>
 
+        {/* Product Details */}
         <div className="space-y-6">
-          <h1 className="text-4xl font-bold text-gray-800">{product.name}</h1>
+          <h1 className="text-3xl font-bold">{product.name}</h1>
           
-          <div className="flex items-center space-x-4">
-            <div className="flex items-baseline space-x-2">
-              <p className="text-3xl font-bold text-brand-dark">৳{product.price}</p>
-              
-              {/* "0" Bug Fix Logic (Bonus) */}
-              {product.originalPrice && product.originalPrice > product.price && (
-                <p className="text-2xl text-gray-400 line-through">৳{product.originalPrice}</p>
-              )}
-            </div>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-sm font-semibold bg-red-100 text-red-600 px-3 py-1 rounded-full">
-                {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-              </span>
+          <div className="flex items-baseline space-x-3">
+            <p className="text-3xl font-bold text-brand-dark">৳{product.price}</p>
+            {hasDiscount && (
+              <p className="text-xl text-gray-500 line-through">
+                ৳{product.originalPrice}
+              </p>
             )}
           </div>
 
-          <div className="flex items-center space-x-4 text-gray-600">
+          <p className="text-gray-700 leading-relaxed">{product.description}</p>
+          
+          <div className="border-t pt-4">
+            <span className="font-semibold">Availability: </span>
             <span className={product.countInStock > 0 ? 'text-green-600' : 'text-red-600'}>
               {product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
             </span>
           </div>
 
-          <p className="text-gray-700 leading-relaxed">{product.description}</p>
-
-          {/* Size Options */}
-          {product.sizes && product.sizes.length > 0 && (
-            <div>
-              <label className="block text-md font-medium text-gray-700 mb-2">Size</label>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map(size => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-md border text-sm
-                                ${selectedSize === size 
-                                  ? 'bg-brand-dark text-white border-brand-dark' 
-                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
+          {/* Size Selection */}
+          <div className="space-y-2">
+            <label className="text-lg font-semibold">Size:</label>
+            <div className="flex flex-wrap gap-2">
+              {product.sizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`px-4 py-2 border rounded-md ${
+                    selectedSize === size
+                      ? 'bg-brand-dark text-white border-brand-dark'
+                      : 'bg-white text-gray-700 border-gray-300'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
             </div>
+          </div>
+
+          {/* Color Selection */}
+          <div className="space-y-2">
+            <label className="text-lg font-semibold">Color:</label>
+            <div className="flex flex-wrap gap-2">
+              {product.colors.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  className={`px-4 py-2 border rounded-md ${
+                    selectedColor === color
+                      ? 'bg-brand-dark text-white border-brand-dark'
+                      : 'bg-white text-gray-700 border-gray-300'
+                  }`}
+                >
+                  {color}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {selectionError && (
+            <div className="text-red-500 text-sm">{selectionError}</div>
           )}
 
-          {/* Color Options */}
-          {product.colors && product.colors.length > 0 && (
-             <div>
-              <label className="block text-md font-medium text-gray-700 mb-2">Color</label>
-              <div className="flex flex-wrap gap-2">
-                {product.colors.map(color => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 rounded-md border text-sm
-                                ${selectedColor === color 
-                                  ? 'bg-brand-dark text-white border-brand-dark' 
-                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* --- Buttons --- */}
+          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <button
-              onClick={handleAddToCart}
-              disabled={product.countInStock === 0}
-              className="flex-1 px-6 py-3 bg-gray-100 text-gray-800 border border-gray-300 font-semibold rounded-lg shadow-sm hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Add to Cart
-            </button>
-            
-            {}
             <button
               onClick={handleOrderNow}
               disabled={product.countInStock === 0}
-              className="flex-1 px-6 py-3 bg-brand-dark text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-brand-primary text-gray-900 font-semibold rounded-md hover:bg-opacity-80 transition-colors disabled:opacity-50"
             >
-              <ShoppingBag size={20} />
               Order Now
             </button>
-            
             <button
-              onClick={handleFavoriteToggle}
-              className={`px-5 py-3 border border-gray-300 rounded-lg shadow-sm
-                          ${favorite ? 'text-red-500 bg-red-50' : 'text-gray-600 bg-white hover:bg-gray-50'}`}
+              onClick={handleAddToCart}
+              disabled={product.countInStock === 0}
+              className="flex-1 px-6 py-3 bg-brand-dark text-white font-semibold rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <Heart size={22} fill={favorite ? 'currentColor' : 'none'} />
+              <ShoppingCart size={20} />
+              Add to Cart
+            </button>
+            <button
+              onClick={handleFavoriteClick}
+              className="p-3 border border-gray-300 rounded-md hover:bg-gray-100"
+            >
+              <Heart size={24} className={isFav ? 'fill-red-500 text-red-500' : 'text-gray-500'} />
             </button>
           </div>
         </div>

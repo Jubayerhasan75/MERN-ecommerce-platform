@@ -1,40 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { useNavigate, Link } from 'react-router-dom';
 import { Order } from '../types';
-import { Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage: React.FC = () => {
-  const { userInfo, logoutUser } = useAppContext();
+  // This is the fix: Use 'logout' and 'userInfo'
+  const { userInfo, logout } = useAppContext();
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (!userInfo) {
       navigate('/login');
-      return;
-    }
-    if (userInfo.isAdmin) {
-      navigate('/admin/dashboard');
-      return;
     }
 
-    const fetchMyOrders = async () => {
-      setLoading(true);
-      setError(null);
+    const fetchOrders = async () => {
+      if (!userInfo) return;
       try {
-       
+        setLoading(true);
         const response = await fetch('http://localhost:5000/api/orders/myorders', {
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${userInfo.token}`,
           },
         });
         if (!response.ok) {
-          throw new Error('Failed to fetch your orders');
+          throw new Error('Failed to fetch orders');
         }
         const data = await response.json();
         setOrders(data);
@@ -44,83 +38,90 @@ const ProfilePage: React.FC = () => {
         setLoading(false);
       }
     };
-
-    fetchMyOrders();
+    fetchOrders();
   }, [userInfo, navigate]);
 
   const handleLogout = () => {
-    logoutUser();
-    navigate('/login');
+    logout(); // This is the fix: Call 'logout()'
+    navigate('/');
   };
 
-  if (loading || !userInfo) {
-    return <div className="p-10 text-center"><Loader2 size={40} className="animate-spin text-brand-accent" /></div>;
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 sm:py-12 max-w-5xl">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        
-        {/* Column 1: Profile Info */}
-        <div className="md:col-span-1">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-6">Your Profile</h1>
-          <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-            <div className="break-words"> 
-              <label className="block text-sm font-medium text-gray-500">Name</label>
-              <p className="text-lg font-semibold">{userInfo.name}</p>
+    <div className="container mx-auto px-4 py-12">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Profile Info Card */}
+        <div className="w-full md:w-1/3">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4">My Profile</h2>
+            <div className="space-y-2">
+              <p><strong>Name:</strong> {userInfo?.name}</p>
+              <p><strong>Email:</strong> {userInfo?.email}</p>
             </div>
-            <div className="break-words">
-              <label className="block text-sm font-medium text-gray-500">Email</label>
-              <p className="text-lg font-semibold">{userInfo.email}</p>
-            </div>
-            <div className="pt-4">
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full mt-6 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Logout
+            </button>
           </div>
         </div>
 
-        {}
-        <div className="md:col-span-2">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6">Order History</h2>
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md space-y-6">
+        {/* Order History */}
+        <div className="w-full md:w-2/3">
+          <h2 className="text-2xl font-bold mb-4">My Orders</h2>
+          <div className="bg-white p-6 rounded-lg shadow-md">
             {loading ? (
-              <div className="text-center"><Loader2 size={32} className="animate-spin" /></div>
+              <div className="flex justify-center items-center h-40">
+                <Loader2 size={40} className="animate-spin" />
+              </div>
             ) : error ? (
               <div className="text-center text-red-500">{error}</div>
             ) : orders.length === 0 ? (
-              
-              <div className="text-center text-gray-500 py-8">You have not placed any orders yet.</div>
+              <p className="text-gray-500">You have no orders yet.</p>
             ) : (
-              <div className="space-y-4">
-                {orders.map(order => (
-                  <Link key={order._id} to={`/order/${order._id}`} className="block border border-gray-200 rounded-lg p-4 transition-colors hover:bg-gray-50">
-                    <div>
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                        <span className="font-semibold text-gray-800 text-sm sm:text-base">Order ID: ...{order._id.substring(18)}</span>
-                        <span className="text-xs sm:text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <div className="mb-2">
-                        {order.isDelivered ? (
-                          <span className="flex items-center text-green-600 text-sm">
-                            <CheckCircle size={16} className="mr-1" /> Delivered
-                          </span>
-                        ) : (
-                          <span className="flex items-center text-yellow-600 text-sm">
-                            <XCircle size={16} className="mr-1" /> Pending
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-right font-bold mt-2">
-                        Total: ৳{order.totalPrice}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivered</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {orders.map((order) => (
+                      <tr key={order._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order._id.substring(0, 10)}...</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">৳{order.totalPrice}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {order.isPaid ? (
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Paid
+                            </span>
+                          ) : (
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                              Not Paid
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {order.isDelivered ? (
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Delivered
+                            </span>
+                          ) : (
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
