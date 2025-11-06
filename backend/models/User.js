@@ -5,7 +5,6 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  // --- ⛔️ Ensure isAdmin defaults to false ---
   isAdmin: { type: Boolean, required: true, default: false },
 }, {
   timestamps: true, // Adds createdAt and updatedAt timestamps

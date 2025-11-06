@@ -1,4 +1,3 @@
-// backend/data/products.js
 const products = [
   {
     name: "Ash Gray T-Shirt",

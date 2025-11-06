@@ -4,7 +4,7 @@ import User from './models/User.js';
 import Order from './models/Order.js';
 import Product from './models/Product.js';
 import adminUser from './data/adminUser.js';
-import products from './data/products.js'; // ⛔️ Apnar Product List
+import products from './data/products.js';
 
 dotenv.config();
 
@@ -20,12 +20,12 @@ const connectDB = async () => {
 
 const importData = async () => {
   try {
-    // 1. Shob purono data delete kora
+  
     await Order.deleteMany();
     await Product.deleteMany();
     await User.deleteMany();
 
-    // 2. Notun Admin ebong Product dhukano
+  
     await User.insertMany(adminUser);
     await Product.insertMany(products); 
 
