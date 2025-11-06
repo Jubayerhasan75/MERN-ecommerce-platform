@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Loader2 } from 'lucide-react';
 import { UserInfo } from '../types';
+import { API_BASE_URL } from '../constants'; // <-- Import korun
 
 const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -13,7 +14,6 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // This is the fix: Use 'login' and 'userInfo'
   const { login, userInfo } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,7 +35,8 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/users', { // Register route
+      // Use API_BASE_URL
+      const response = await fetch(`${API_BASE_URL}/api/users`, { // Register route
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
@@ -47,7 +48,7 @@ const RegisterPage: React.FC = () => {
         throw new Error((data as { message: string }).message || 'Registration failed');
       }
       
-      login(data as UserInfo); // This is the fix: Call 'login()'
+      login(data as UserInfo);
       navigate(redirect);
 
     } catch (err) {
@@ -60,13 +61,11 @@ const RegisterPage: React.FC = () => {
     <div className="flex items-center justify-center min-h-[70vh] bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <h2 className="text-3xl font-bold text-center text-gray-800">Register</h2>
-        
         {error && (
           <div className="p-3 text-center text-red-800 bg-red-100 rounded-md">
             {error}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -123,7 +122,6 @@ const RegisterPage: React.FC = () => {
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-dark focus:border-brand-dark"
             />
           </div>
-
           <div>
             <button
               type="submit"
@@ -134,7 +132,6 @@ const RegisterPage: React.FC = () => {
             </button>
           </div>
         </form>
-
         <div className="text-sm text-center">
           <p className="text-gray-600">
             Already have an account?{' '}

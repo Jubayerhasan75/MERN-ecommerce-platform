@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Product } from '../types';
 import { Loader2, Heart, ShoppingCart } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE_URL } from '../constants'; // <-- Import korun
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,27 +12,24 @@ const ProductDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // State for selection
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectionError, setSelectionError] = useState<string>('');
 
-  // This is the fix: Use new function names
   const { addToCart, addFavorite, removeFavorite, isFavorite } = useAppContext();
-  
   const isFav = product ? isFavorite(product._id) : false;
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        // Use API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
         if (!response.ok) {
           throw new Error('Product not found');
         }
         const data = await response.json();
         setProduct(data);
-        // Set default size and color if available
         if (data.sizes && data.sizes.length > 0) setSelectedSize(data.sizes[0]);
         if (data.colors && data.colors.length > 0) setSelectedColor(data.colors[0]);
       } catch (err) {
@@ -58,27 +56,24 @@ const ProductDetailPage: React.FC = () => {
 
   const handleAddToCart = () => {
     if (product && validateSelection()) {
-      // This is the fix: Pass a single CartItem object
       addToCart({
         product,
         quantity: 1,
         size: selectedSize,
         color: selectedColor,
       });
-      // Optional: Show a success message
     }
   };
 
   const handleOrderNow = () => {
     if (product && validateSelection()) {
-      // This is the fix: Pass a single CartItem object
       addToCart({
         product,
         quantity: 1,
         size: selectedSize,
         color: selectedColor,
       });
-      navigate('/checkout'); // Redirect to checkout
+      navigate('/checkout');
     }
   };
   
@@ -101,7 +96,6 @@ const ProductDetailPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Image */}
         <div className="bg-white p-4 rounded-lg shadow-md">
           <img
             src={product.imageUrl}
@@ -109,11 +103,8 @@ const ProductDetailPage: React.FC = () => {
             className="w-full h-auto object-cover rounded-lg"
           />
         </div>
-
-        {/* Product Details */}
         <div className="space-y-6">
           <h1 className="text-3xl font-bold">{product.name}</h1>
-          
           <div className="flex items-baseline space-x-3">
             <p className="text-3xl font-bold text-brand-dark">৳{product.price}</p>
             {hasDiscount && (
@@ -122,17 +113,13 @@ const ProductDetailPage: React.FC = () => {
               </p>
             )}
           </div>
-
           <p className="text-gray-700 leading-relaxed">{product.description}</p>
-          
           <div className="border-t pt-4">
             <span className="font-semibold">Availability: </span>
             <span className={product.countInStock > 0 ? 'text-green-600' : 'text-red-600'}>
               {product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
             </span>
           </div>
-
-          {/* Size Selection */}
           <div className="space-y-2">
             <label className="text-lg font-semibold">Size:</label>
             <div className="flex flex-wrap gap-2">
@@ -151,8 +138,6 @@ const ProductDetailPage: React.FC = () => {
               ))}
             </div>
           </div>
-
-          {/* Color Selection */}
           <div className="space-y-2">
             <label className="text-lg font-semibold">Color:</label>
             <div className="flex flex-wrap gap-2">
@@ -171,12 +156,9 @@ const ProductDetailPage: React.FC = () => {
               ))}
             </div>
           </div>
-
           {selectionError && (
             <div className="text-red-500 text-sm">{selectionError}</div>
           )}
-
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
               onClick={handleOrderNow}

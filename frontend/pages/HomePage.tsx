@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Product } from '../types';
 import { Loader2 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import homeImg from '../assets/home.png'; // This line will now work
+import homeImg from '../assets/home.png';
+import { API_BASE_URL } from '../constants'; // <-- Import korun
 
 const HomePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,12 +14,12 @@ const HomePage: React.FC = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/products');
+        // Use API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}/api/products`);
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
         const data = await response.json();
-        // Get only the first 4 products for the homepage
         setProducts(data.slice(0, 4));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -62,7 +63,6 @@ const HomePage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product) => (
-              // This is the fix: Use product._id, not product.id
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

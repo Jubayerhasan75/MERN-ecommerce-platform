@@ -3,9 +3,9 @@ import { useAppContext } from '../context/AppContext';
 import { Order } from '../types';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../constants'; // <-- Import korun
 
 const ProfilePage: React.FC = () => {
-  // This is the fix: Use 'logout' and 'userInfo'
   const { userInfo, logout } = useAppContext();
   const navigate = useNavigate();
 
@@ -22,7 +22,8 @@ const ProfilePage: React.FC = () => {
       if (!userInfo) return;
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/orders/myorders', {
+        // Use API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}/api/orders/myorders`, {
           headers: {
             'Authorization': `Bearer ${userInfo.token}`,
           },
@@ -42,14 +43,13 @@ const ProfilePage: React.FC = () => {
   }, [userInfo, navigate]);
 
   const handleLogout = () => {
-    logout(); // This is the fix: Call 'logout()'
+    logout();
     navigate('/');
   };
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Profile Info Card */}
         <div className="w-full md:w-1/3">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">My Profile</h2>
@@ -65,8 +65,6 @@ const ProfilePage: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Order History */}
         <div className="w-full md:w-2/3">
           <h2 className="text-2xl font-bold mb-4">My Orders</h2>
           <div className="bg-white p-6 rounded-lg shadow-md">

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Loader2 } from 'lucide-react';
 import { UserInfo } from '../types';
+import { API_BASE_URL } from '../constants'; // <-- Notun URL constant import kora
 
 const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -29,7 +30,8 @@ const AdminLoginPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/users/login', {
+      // Use API_BASE_URL instead of 'http://localhost:5000'
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
